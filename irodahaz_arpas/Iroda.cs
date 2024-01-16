@@ -19,12 +19,13 @@ namespace irodahaz_arpas
             Emelet = emeletIndex;
             Kod = d[0];
             Kezdet = int.Parse(d[1]);
-            for (int i = 0; i < 12; i++) IrodaLetszamok.Add(int.Parse(d[i]));
+            IrodaLetszamok = new List<int>();
+            for (int i = 2; i < 14; i++) IrodaLetszamok.Add(int.Parse(d[i]));
         }
 
         public override string ToString()
         {
-            return $"Emelet: {Emelet} | Kód: {Kod}";
+            return $"{Emelet, -6} | {Kod, -13} | {Kezdet, -10} | {string.Join(", " ,IrodaLetszamok)}";
         }
 
     }
