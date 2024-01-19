@@ -1,4 +1,8 @@
-﻿using System.Text;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
 
 namespace irodahaz_arpas
 {
@@ -7,19 +11,20 @@ namespace irodahaz_arpas
         static void Main(string[] args)
         {
             List<Iroda> irodak = new List<Iroda>();
-            StreamReader sr = new(@"..\..\..\src\irodahaz.txt", encoding: Encoding.UTF8);
-
-            int emeletIndex = 1;
-
-            while (!sr.EndOfStream)
+            using (StreamReader sr = new StreamReader(@"..\..\..\src\irodahaz.txt", encoding: Encoding.UTF8))
             {
-                irodak.Add(new(sr.ReadLine(), emeletIndex));
-                emeletIndex++;
+                int emeletIndex = 1;
+
+                while (!sr.EndOfStream)
+                {
+                    irodak.Add(new Iroda(sr.ReadLine(), emeletIndex));
+                    emeletIndex++;
+                }
             }
 
             Console.WriteLine("\n7. feladat:");
 
-            Console.WriteLine($"Emelet | {"Kód", -13} | Beköltözés | Irodalétszámok");
+            Console.WriteLine($"Emelet | {"Kód",-13} | Beköltözés | Irodalétszámok");
 
             foreach (var item in irodak)
             {
@@ -41,17 +46,17 @@ namespace irodahaz_arpas
 
             Console.WriteLine("\n11. feladat:");
 
-            using StreamWriter sw = new(@"..\..\..\src\nemdolgoznak.txt", false, encoding: Encoding.UTF8)
+            using (StreamWriter sw = new StreamWriter(@"..\..\..\src\nemdolgoznak.txt", false, encoding: Encoding.UTF8))
             {
-                List<String> nemDolgozokLista = NemDolgoznak(irodak);
+                List<string> nemDolgozokLista = NemDolgoznak(irodak);
+                foreach (var nemDolgozo in nemDolgozokLista)
+                {
+                    sw.WriteLine(nemDolgozo);
+                }
             }
-
-
-
 
             Console.ReadKey();
         }
-    }
 
         static Iroda LegtobbDolgozoEmelet(List<Iroda> irodak) => irodak.MaxBy(i => i.IrodaLetszamok.Sum());
         static Iroda KilencDolgozosIroda(List<Iroda> irodak) => irodak.SingleOrDefault(i => i.IrodaLetszamok.Any(e => e == 9));
@@ -59,15 +64,15 @@ namespace irodahaz_arpas
         static List<string> NemDolgoznak(List<Iroda> irodak)
         {
             List<Iroda> emeletenNemDolgoznak = irodak.Where(i => i.IrodaLetszamok.Contains(0)).ToList();
-            List<string> returnList = new();
+            List<string> returnList = new List<string>();
             foreach (var e in emeletenNemDolgoznak)
             {
-                List<int> sorszamok = new();
-                foreach (var i in e.IrodaLetszamok)
+                List<int> sorszamok = new List<int>();
+                for (int i = 0; i < e.IrodaLetszamok.Count; i++)
                 {
-                    if (i == 0)
+                    if (e.IrodaLetszamok[i] == 0)
                     {
-                        sorszamok.Add(e.IrodaLetszamok[i] + 1 + 2);
+                        sorszamok.Add(i + 1);
                     }
                 }
                 string cegKod = e.Kod;
