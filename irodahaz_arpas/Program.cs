@@ -46,14 +46,37 @@ namespace irodahaz_arpas
 
             Console.WriteLine("\n11. feladat:");
 
-            using (StreamWriter sw = new StreamWriter(@"..\..\..\src\nemdolgoznak.txt", false, encoding: Encoding.UTF8))
+            using StreamWriter sw = new StreamWriter(@"..\..\..\src\nemdolgoznak.txt", false, encoding: Encoding.UTF8);
+
+            List<string> nemDolgozokLista = NemDolgoznak(irodak);
+            foreach (var nemDolgozo in nemDolgozokLista)
             {
-                List<string> nemDolgozokLista = NemDolgoznak(irodak);
-                foreach (var nemDolgozo in nemDolgozokLista)
-                {
-                    sw.WriteLine(nemDolgozo);
-                }
+                sw.WriteLine(nemDolgozo);
             }
+
+            Console.WriteLine("A fájlbeírás megtörtént.");
+
+            Console.WriteLine("\n12. feladat:");
+
+            Console.WriteLine($"A LOGMEIN kódú cég irodáiban átlagosan {AtlagDolgozoLOGMEIN(irodak)} személy dolgozik.");
+
+            Console.WriteLine("\n13. feladat:");
+
+            AdottEmeletenDolgozokSzama(irodak, sw);
+            
+            Console.WriteLine("A fájlbeírás megtörtént.");
+
+            Console.WriteLine();
+
+            Console.WriteLine("\n14. feladat:");
+            Console.WriteLine($"Az irodai dolgozók összlétszáma {OsszesFoAzIrodaban(irodak)}.");
+
+            Console.WriteLine("\n15. feladat:");
+
+            Console.WriteLine($"Az első irodabérlés éve {ElsoIrodaBerlesEve(irodak)}.");
+
+            Console.WriteLine("\n16. feladat:");
+            Console.WriteLine($"{EnnyiEveNemTortentUjIrodaberles(irodak)} éve nem történt új irodabérlés.");
 
             Console.ReadKey();
         }
@@ -81,5 +104,14 @@ namespace irodahaz_arpas
             }
             return returnList;
         }
+        static int AtlagDolgozoLOGMEIN(List<Iroda> irodak) => (int)irodak.First(i => i.Kod == "LOGMEIN").IrodaLetszamok.Average(e => e);
+        static void AdottEmeletenDolgozokSzama(List<Iroda> irodak, StreamWriter sw)
+        {
+            sw.WriteLine("Az emeletenkénti dolgozó emberek száma:");
+            for (int i = 0; i < irodak.Count; i++) sw.WriteLine($"{i + 1}. {irodak[i].IrodaLetszamok.Sum()}");
+        }
+        static int OsszesFoAzIrodaban(List<Iroda> irodak) => irodak.Sum(i => i.IrodaLetszamok.Sum());
+        static int ElsoIrodaBerlesEve(List<Iroda> irodak) => irodak.Min(i => i.Kezdet);
+        static int EnnyiEveNemTortentUjIrodaberles(List<Iroda> irodak) => -(irodak.Max(i => i.Kezdet) - DateTime.Now.Year);
     }
 }
