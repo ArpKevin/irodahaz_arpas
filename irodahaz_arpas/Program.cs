@@ -86,22 +86,42 @@ namespace irodahaz_arpas
         static int OtDolgozonalTobbIroda(List<Iroda> irodak) => irodak.Sum(i => i.IrodaLetszamok.Count(e => e > 5));
         static List<string> NemDolgoznak(List<Iroda> irodak)
         {
+            //List<string> returnList = new List<string>();
+
+            //List<Iroda> emeletenNemDolgoznak = irodak.Where(i => i.IrodaLetszamok.Contains(0)).ToList();
+            //foreach (var e in emeletenNemDolgoznak)
+            //{
+            //    List<int> sorszamok = new List<int>();
+            //    for (int i = 0; i < e.IrodaLetszamok.Count; i++)
+            //    {
+            //        if (e.IrodaLetszamok[i] == 0)
+            //        {
+            //            sorszamok.Add(i + 1);
+            //        }
+            //    }
+            //    string cegKod = e.Kod;
+            //    string teljesAdat = $"{cegKod} {string.Join(" ", sorszamok)}";
+            //    returnList.Add(teljesAdat);
+            //}
+            //return returnList;
             List<Iroda> emeletenNemDolgoznak = irodak.Where(i => i.IrodaLetszamok.Contains(0)).ToList();
-            List<string> returnList = new List<string>();
-            foreach (var e in emeletenNemDolgoznak)
-            {
-                List<int> sorszamok = new List<int>();
-                for (int i = 0; i < e.IrodaLetszamok.Count; i++)
+
+            List<string> returnList = emeletenNemDolgoznak
+                .Select(e =>
                 {
-                    if (e.IrodaLetszamok[i] == 0)
-                    {
-                        sorszamok.Add(i + 1);
-                    }
-                }
-                string cegKod = e.Kod;
-                string teljesAdat = $"{cegKod} {string.Join(" ", sorszamok)}";
-                returnList.Add(teljesAdat);
-            }
+                    List<int> sorszamok = e.IrodaLetszamok
+                        .Select((letszam, index) => new { Letszam = letszam, Index = index + 1 })
+                        .Where(x => x.Letszam == 0)
+                        .Select(x => x.Index)
+                        .ToList();
+
+                    string cegKod = e.Kod;
+                    string teljesAdat = $"{cegKod} {string.Join(" ", sorszamok)}";
+
+                    return teljesAdat;
+                })
+                .ToList();
+
             return returnList;
         }
         static int AtlagDolgozoLOGMEIN(List<Iroda> irodak) => (int)irodak.First(i => i.Kod == "LOGMEIN").IrodaLetszamok.Average(e => e);
